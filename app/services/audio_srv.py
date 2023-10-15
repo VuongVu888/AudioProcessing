@@ -1,9 +1,9 @@
 import asyncio
-import sys
 import re
 
 from fastapi import UploadFile, HTTPException
-from app.config.utils import config, save_file
+
+from app.config.utils import save_file
 
 
 class AudioSrv():

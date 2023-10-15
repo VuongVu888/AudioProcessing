@@ -1,11 +1,15 @@
-import aiofiles
 import os
-from pathlib import Path
 import uuid
+from pathlib import Path
+
+import aiofiles
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Config:
     BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-    SAVE_AUDIO_DIR = "/audio_files"
+    SAVE_AUDIO_DIR = os.path.join(BASE_DIR, f"audio_files")
 
 config = Config()
 
