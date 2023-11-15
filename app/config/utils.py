@@ -11,6 +11,14 @@ class Config:
     BASE_DIR = Path(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
     SAVE_AUDIO_DIR = os.path.join(BASE_DIR, f"audio_files")
 
+    RABBITMQ_URL = os.getenv('RABBITMQ_URL', 'localhost')
+    RABBITMQ_PORT = int(os.getenv('RABBITMQ_PORT', '5672'))
+    RABBITMQ_USER = os.getenv('RABBITMQ_USER', ' ')
+    RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD', ' ')
+
+    REDIS_URL = os.getenv('REDIS_URL', 'localhost')
+    REDIS_PORT = int(os.getenv('REDIS_PORT', '6379'))
+
 config = Config()
 
 async def save_file(audio_file):
