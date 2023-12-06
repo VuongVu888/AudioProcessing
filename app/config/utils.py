@@ -19,6 +19,8 @@ class Config:
     REDIS_URL = os.getenv('REDIS_URL', 'localhost')
     REDIS_PORT = int(os.getenv('REDIS_PORT', '6379'))
 
+    MODEL_PATH = os.getenv('MODEL_PATH', ' ')
+
 config = Config()
 
 async def save_file(audio_file):

@@ -25,6 +25,66 @@ services:
     networks:
       - app
 
+  fastapi:
+    image: vuongvu/audio-processing:v1
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 4
+    ports:
+      - 5000-5020:5000
+    environment:
+      - RABBITMQ_URL=host.docker.internal
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=root
+      - RABBITMQ_PASSWORD=root
+      - REDIS_URL=host.docker.internal
+      - REDIS_PORT=6379
+      - MODEL_PATH=./transcription_model/model_weight/conformer.nemo
+    volumes:
+      - .:/app
+    command: conda run -n audio-processing uvicorn app.main:app --host 0.0.0.0 --port 3000
+    networks:
+      - app
+    depends_on:
+      - rabbitmq
+      - redis
+
+  inference-workers:
+    image: vuongvu/audio-processing:v1
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 4
+    environment:
+      - RABBITMQ_URL=host.docker.internal
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=root
+      - RABBITMQ_PASSWORD=root
+      - REDIS_URL=host.docker.internal
+      - REDIS_PORT=6379
+      - MODEL_PATH=./transcription_model/model_weight/conformer.nemo
+    volumes:
+      - .:/app
+    command: conda run -n audio-processing python3.9 -u inference_workers/workers.py
+    networks:
+      - app
+    depends_on:
+      - rabbitmq
+      - redis
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - fastapi
+      - inference-workers
+    ports:
+      - 8080:8080
+    networks:
+      - app
+
 networks:
   app:
     driver: bridge
