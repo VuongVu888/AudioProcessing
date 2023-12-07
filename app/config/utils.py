@@ -24,13 +24,14 @@ class Config:
 config = Config()
 
 async def save_file(audio_file):
-    file_uuid = uuid.uuid4()
+    inference_id = str(uuid.uuid4())
+
     save_file_path = os.path.join(config.BASE_DIR, f"audio_files")
 
     if not os.path.exists(save_file_path):
         os.makedirs(save_file_path)
 
-    save_file_path = os.path.join(save_file_path, f"{file_uuid}.wav")
+    save_file_path = os.path.join(save_file_path, f"{inference_id}.wav")
 
     async with aiofiles.open(save_file_path, 'wb') as out_file:
         content = await audio_file.read()

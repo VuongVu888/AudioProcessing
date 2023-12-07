@@ -32,7 +32,7 @@ class RabbitMQSubsriber:
                 exchange=RABBITMQ_EXCHANGE,
                 routing_key=RABBITMQ_ROUTING_KEY,
             )
-            self._channel.basic_qos(prefetch_count=1)
+            self._channel.basic_qos(prefetch_count=5)
             self._channel.basic_consume(
                 queue=RABBITMQ_QUEUE,
                 on_message_callback=message_callback,

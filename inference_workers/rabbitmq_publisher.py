@@ -3,7 +3,6 @@ import logging
 import pika
 from pika import PlainCredentials, BasicProperties
 from pika.exchange_type import ExchangeType
-import redis
 
 from app.config.utils import config
 from app.config.const import RABBITMQ_QUEUE, RABBITMQ_EXCHANGE, RABBITMQ_ROUTING_KEY
@@ -43,7 +42,7 @@ class RabbitMQPublisher:
             routing_key=RABBITMQ_ROUTING_KEY,
             body=msg,
             properties=BasicProperties(
-                headers=headers
+                headers=headers,
             )
         )
         logger.debug('message sent: %s', msg)
@@ -67,4 +66,3 @@ rabbitmq_publisher = RabbitMQPublisher(
     username=config.RABBITMQ_USER,
     password=config.RABBITMQ_PASSWORD,
 )
-redis_client = redis.Redis(host=config.REDIS_URL, port=config.REDIS_PORT)

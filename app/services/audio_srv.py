@@ -4,6 +4,7 @@ import uuid
 import re
 from io import BytesIO
 
+import redis
 from fastapi import UploadFile, HTTPException
 import pickle
 from pydub import AudioSegment
@@ -12,11 +13,13 @@ from pika import BasicProperties
 from pydub.utils import mediainfo
 
 from app.config.const import RABBITMQ_EXCHANGE, RABBITMQ_ROUTING_KEY
-from app.config.utils import save_file
-from inference_workers.rabbitmq_publisher import rabbitmq_publisher, redis_client
+from app.config.utils import save_file, config
+from inference_workers.rabbitmq_publisher import rabbitmq_publisher
 from transcription_model.transcription_service import TranscriptionService
 
 transcription_srv = TranscriptionService()
+
+redis_client = redis.Redis(host=config.REDIS_URL, port=config.REDIS_PORT)
 
 class AudioSrv():
     async def process_audio(self, audio_file: UploadFile):
@@ -37,16 +40,6 @@ class AudioSrv():
             'inference_id': inference_id
         }
         rabbitmq_publisher.publish(msg=file_path, headers=headers)
-        # rabbitmq_client.basic_publish(
-        #     exchange=RABBITMQ_EXCHANGE,
-        #     routing_key=RABBITMQ_ROUTING_KEY,
-        #     body=file_path,
-        #     properties=BasicProperties(
-        #         headers={
-        #             'inference_id': inference_id
-        #         }
-        #     )
-        # )
 
         check_inference_result = redis_client.exists(inference_id)
         while not check_inference_result:
