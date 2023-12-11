@@ -2,28 +2,30 @@ version: "3.2"
 services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    ports:
-      - 5672:5672
-      - 15672:15672
+#    ports:
+#      - 5672:5672
+#      - 15672:15672
     volumes:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq/
     environment:
       - RABBITMQ_DEFAULT_USER=root
       - RABBITMQ_DEFAULT_PASS=root
-    networks:
-      - app
+    network_mode: host
+#    networks:
+#      - app
 
   redis:
     image: bitnami/redis:latest
-    ports:
-      - 6379:6379
+#    ports:
+#      - 6379:6379
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     volumes:
       - ~/.docker-conf/redis/data/:/bitnami/redis/data
-    networks:
-      - app
+    network_mode: host
+#    networks:
+#      - app
 
   fastapi:
     image: vuongvu/audio-processing:v1
@@ -34,11 +36,11 @@ services:
     ports:
       - 5000-5020:5000
     environment:
-      - RABBITMQ_URL=host.docker.internal
+      - RABBITMQ_URL=localhost
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=root
       - RABBITMQ_PASSWORD=root
-      - REDIS_URL=host.docker.internal
+      - REDIS_URL=localhost
       - REDIS_PORT=6379
       - MODEL_PATH=./transcription_model/model_weight/conformer.nemo
     volumes:
@@ -57,11 +59,11 @@ services:
       mode: replicated
       replicas: 4
     environment:
-      - RABBITMQ_URL=host.docker.internal
+      - RABBITMQ_URL=localhost
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=root
       - RABBITMQ_PASSWORD=root
-      - REDIS_URL=host.docker.internal
+      - REDIS_URL=localhost
       - REDIS_PORT=6379
       - MODEL_PATH=./transcription_model/model_weight/conformer.nemo
     volumes:

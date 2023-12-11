@@ -1,11 +1,11 @@
 import logging
 
 import pika
-from pika import PlainCredentials, BasicProperties
+from pika import BasicProperties
 from pika.exchange_type import ExchangeType
 
-from app.config.utils import config
 from app.config.const import RABBITMQ_QUEUE, RABBITMQ_EXCHANGE, RABBITMQ_ROUTING_KEY
+from app.config.utils import config
 
 logger = logging.getLogger(__file__)
 

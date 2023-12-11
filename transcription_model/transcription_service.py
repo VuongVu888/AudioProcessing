@@ -2,6 +2,7 @@ import nemo.collections.asr as nemo_asr
 
 from app.config.utils import config
 
+
 class TranscriptionService():
     def __init__(self):
         self.conformer = nemo_asr.models.EncDecCTCModelBPE.restore_from(
