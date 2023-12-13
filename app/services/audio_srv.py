@@ -1,14 +1,14 @@
 import asyncio
 import os
 import re
+import time
 import uuid
 
 import redis
 from fastapi import UploadFile, HTTPException
-from pika import BasicProperties
-from pydub.utils import mediainfo
+import soundfile as sf
+from scipy.io.wavfile import read
 
-from app.config.const import RABBITMQ_EXCHANGE, RABBITMQ_ROUTING_KEY
 from app.config.utils import save_file, config
 from inference_workers.rabbitmq_publisher import rabbitmq_publisher
 from transcription_model.transcription_service import TranscriptionService
@@ -22,7 +22,11 @@ class AudioSrv():
         inference_id = str(uuid.uuid4())
         save_file_path = await save_file(audio_file, inference_id)
         audio_duration = self.get_audio_duration(save_file_path)
+
+        start = time.time()
         inference_result = self.publish_rabbitmq(save_file_path, inference_id)
+        runtime = round((time.time() - start) * 1000, 1000)
+        print("Inference Runtime: ", runtime)
         # inference_result = transcription_srv.inference([save_file_path])
         os.remove(save_file_path)
 
@@ -51,8 +55,8 @@ class AudioSrv():
         return inference_result
 
     def get_audio_duration(self, file_path):
-        audio_info = mediainfo(file_path)
-        duration_in_seconds = float(audio_info['duration'])
+        with sf.SoundFile(file_path) as audio_file:
+            duration_in_seconds = len(audio_file) / audio_file.samplerate
         return duration_in_seconds
 
     async def disect_audio_file(self, save_file_path):
