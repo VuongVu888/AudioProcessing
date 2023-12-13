@@ -22,11 +22,7 @@ class AudioSrv():
         inference_id = str(uuid.uuid4())
         save_file_path = await save_file(audio_file, inference_id)
         audio_duration = self.get_audio_duration(save_file_path)
-
-        start = time.time()
         inference_result = self.publish_rabbitmq(save_file_path, inference_id)
-        runtime = round((time.time() - start) * 1000, 1000)
-        print("Inference Runtime: ", runtime)
         # inference_result = transcription_srv.inference([save_file_path])
         os.remove(save_file_path)
 
