@@ -5,8 +5,10 @@ import uuid
 
 import redis
 from fastapi import UploadFile, HTTPException
+from pika import BasicProperties
 from pydub.utils import mediainfo
 
+from app.config.const import RABBITMQ_EXCHANGE, RABBITMQ_ROUTING_KEY
 from app.config.utils import save_file, config
 from inference_workers.rabbitmq_publisher import rabbitmq_publisher
 from transcription_model.transcription_service import TranscriptionService
@@ -17,9 +19,10 @@ redis_client = redis.Redis(host=config.REDIS_URL, port=config.REDIS_PORT)
 
 class AudioSrv():
     async def process_audio(self, audio_file: UploadFile):
-        save_file_path = await save_file(audio_file)
+        inference_id = str(uuid.uuid4())
+        save_file_path = await save_file(audio_file, inference_id)
         audio_duration = self.get_audio_duration(save_file_path)
-        inference_result = self.publish_rabbitmq(save_file_path)
+        inference_result = self.publish_rabbitmq(save_file_path, inference_id)
         # inference_result = transcription_srv.inference([save_file_path])
         os.remove(save_file_path)
 
@@ -28,12 +31,14 @@ class AudioSrv():
             "text": inference_result
         }
 
-    def publish_rabbitmq(self, file_path):
-        inference_id = str(uuid.uuid4())
+    def publish_rabbitmq(self, file_path, inference_id):
         headers = {
             'inference_id': inference_id
         }
-        rabbitmq_publisher.publish(msg=file_path, headers=headers)
+        rabbitmq_publisher.publish(
+            msg=file_path,
+            headers=headers,
+        )
 
         check_inference_result = redis_client.exists(inference_id)
         while not check_inference_result:

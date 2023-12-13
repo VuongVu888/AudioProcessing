@@ -23,8 +23,9 @@ class Config:
 
 config = Config()
 
-async def save_file(audio_file):
-    inference_id = str(uuid.uuid4())
+async def save_file(audio_file, inference_id=None):
+    if inference_id == None:
+        inference_id = str(uuid.uuid4())
 
     save_file_path = os.path.join(config.BASE_DIR, f"audio_files")
 
