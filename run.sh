@@ -26,7 +26,7 @@ tmux split-window -t mysession:0.2 "source $ENV_VARS_SCRIPT && python -u inferen
 tmux split-window -t mysession:0.3 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
 
 # Set focus on the first pane
-tmux select-pane -t mysession:0.0
+tmux select-layout -t mysession:0.0
 
 # Wait for all processes to finish
 wait
