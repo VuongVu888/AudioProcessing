@@ -3,6 +3,7 @@ import logging
 import os
 
 from fastapi import FastAPI
+import uvicorn
 
 from app.api.api_router import router
 from app.config.utils import config
@@ -28,3 +29,11 @@ def get_application(debug: bool = False) -> FastAPI:
 
 
 app = get_application()
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "app.main:app",
+        host='0.0.0.0',
+        port=3000,
+        workers=4,
+    )

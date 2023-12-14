@@ -14,7 +14,7 @@ terminate_processes() {
 trap terminate_processes INT
 
 # Start a tmux session for FastAPI
-tmux new-session -d -s mysession "uvicorn app.main:app --host 0.0.0.0 --port 3000 --workers 4"
+tmux new-session -d -s mysession "python -u app/main.py"
 
 # Start RabbitMQ consumers
 for i in {1..4}; do
