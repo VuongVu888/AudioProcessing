@@ -10,7 +10,9 @@ class TranscriptionService():
         )
 
     def inference(self, file_paths):
-        inference_result = self.conformer.transcribe(paths2audio_files=file_paths)
-        # print(inference_result.shape)
+        transcription = self.conformer.transcribe(
+            paths2audio_files=file_paths,
+            batch_size=16,
+        )
 
-        return inference_result
+        return transcription

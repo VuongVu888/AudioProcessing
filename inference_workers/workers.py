@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import redis
 
-from app.config.utils import config
+from app.config.utils import config, split_audio_file
 from inference_workers.rabbitmq_subscriber import rabbitmq_consumer
 from transcription_model.transcription_service import TranscriptionService
 
@@ -24,9 +24,14 @@ def ack_message(channel, delivery_tag):
 
 def do_work(ch, delivery_tag, properties, body):
     file_path = body.decode("utf-8")
-    inference_result = transcription_srv.inference(file_paths=[file_path])
-    redis_client.set(properties.headers["inference_id"], inference_result[0])
-    # executor.submit(redis_client.set, properties.headers["inference_id"], inference_result[0])
+    file_paths = split_audio_file(
+        input_file=file_path,
+        output_folder=config.SAVE_AUDIO_DIR,
+        chunk_duration_seconds=25,
+    )
+    inference_result = transcription_srv.inference(file_paths=file_paths)
+    inference_result = " ".join(inference_result)
+    redis_client.set(properties.headers["inference_id"], inference_result)
 
     cb = functools.partial(ack_message, ch, delivery_tag)
     ch.connection.add_callback_threadsafe(cb)

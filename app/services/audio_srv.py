@@ -1,13 +1,11 @@
 import asyncio
 import os
 import re
-import time
 import uuid
 
 import redis
 from fastapi import UploadFile, HTTPException
 import soundfile as sf
-from scipy.io.wavfile import read
 
 from app.config.utils import save_file, config
 from inference_workers.rabbitmq_publisher import rabbitmq_publisher

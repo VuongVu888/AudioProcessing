@@ -266,3 +266,4 @@ youtokentome==1.0.6
 zarr==2.16.1
 zipp==3.17.0
 locust==2.19.0
+soundfile==0.12.1

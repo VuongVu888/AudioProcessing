@@ -4,6 +4,8 @@ from pathlib import Path
 
 import aiofiles
 from dotenv import load_dotenv
+import soundfile as sf
+import numpy as np
 
 load_dotenv()
 
@@ -40,3 +42,32 @@ async def save_file(audio_file, inference_id=None):
         await out_file.close()
 
     return save_file_path
+
+def split_audio_file(input_file, output_folder, chunk_duration_seconds=5):
+    # Read the audio file
+    data, samplerate = sf.read(input_file)
+    print("Data shape: ", len(data.shape))
+    if len(data.shape) != 1:
+        data = np.mean(data, axis=1)
+
+    # Calculate the number of samples in each chunk
+    chunk_size = int(chunk_duration_seconds * samplerate)
+
+    # Split the audio into chunks
+    num_chunks = int(np.ceil(len(data) / chunk_size))
+
+    output_files = []
+    id = str(uuid.uuid4())
+    for i in range(num_chunks):
+        start_idx = i * chunk_size
+        end_idx = min((i + 1) * chunk_size, len(data))
+
+        # Extract the chunk
+        chunk = data[start_idx:end_idx]
+
+        # Save the chunk to a new file
+        output_file = f"{output_folder}/{id}_{i + 1}.wav"
+        output_files.append(output_file)
+        sf.write(output_file, chunk, samplerate)
+
+    return output_files
