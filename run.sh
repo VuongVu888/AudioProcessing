@@ -20,13 +20,10 @@ tmux new-session -d -s mysession "source $ENV_VARS_SCRIPT && uvicorn app.main:ap
 fastapi_pid=$!
 
 # Split the tmux session into 4 panes and start RabbitMQ consumers in each pane
-tmux split-window -t mysession:0.0 -h -l 100 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
-tmux split-window -t mysession:0.1 -h -l 100 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
-tmux split-window -t mysession:0.2 -h -l 100 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
-tmux split-window -t mysession:0.3 -h -l 100 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
-
-# Set focus on the first pane
-tmux select-layout -t mysession:0.0
+tmux new-session -d -s consumer1 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
+tmux new-session -d -s consumer2 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
+tmux new-session -d -s consumer3 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
+tmux new-session -d -s consumer4 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
 
 # Wait for all processes to finish
 wait

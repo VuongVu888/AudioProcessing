@@ -1,3 +1,5 @@
+conda activate audio-processing
+
 export PYTHONPATH=$(pwd)
 export RABBITMQ_URL=localhost
 export RABBITMQ_PORT=5672
