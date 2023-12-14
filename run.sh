@@ -20,10 +20,10 @@ tmux new-session -d -s mysession "source $ENV_VARS_SCRIPT && uvicorn app.main:ap
 fastapi_pid=$!
 
 # Split the tmux session into 4 panes and start RabbitMQ consumers in each pane
-tmux split-window -t mysession:0.0 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
-tmux split-window -t mysession:0.1 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
-tmux split-window -t mysession:0.2 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
-tmux split-window -t mysession:0.3 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
+tmux split-window -t mysession:0.0 -h -l 100 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
+tmux split-window -t mysession:0.1 -h -l 100 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
+tmux split-window -t mysession:0.2 -h -l 100 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
+tmux split-window -t mysession:0.3 -h -l 100 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
 
 # Set focus on the first pane
 tmux select-layout -t mysession:0.0
