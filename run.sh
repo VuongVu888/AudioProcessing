@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PYTHONPATH=$(pwd)
+
 # Function to gracefully terminate processes
 terminate_processes() {
     echo "Terminating processes..."
