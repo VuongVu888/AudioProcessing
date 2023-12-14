@@ -14,7 +14,7 @@ terminate_processes() {
 trap terminate_processes INT
 
 # Start a tmux session named "mysession"
-tmux new-session -d -s mysession "source $ENV_VARS_SCRIPT && uvicorn app.main:app --host 0.0.0.0 --port 3000 --workers 4"
+tmux new-session -d -s fastapi "source $ENV_VARS_SCRIPT && uvicorn app.main:app --host 0.0.0.0 --port 3000 --workers 4"
 
 # Store PID of FastAPI process
 fastapi_pid=$!
@@ -24,6 +24,8 @@ tmux new-session -d -s consumer1 "source $ENV_VARS_SCRIPT && python -u inference
 tmux new-session -d -s consumer2 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
 tmux new-session -d -s consumer3 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
 tmux new-session -d -s consumer4 "source $ENV_VARS_SCRIPT && python -u inference_workers/workers.py"
+
+tmux attach -t fastapi
 
 # Wait for all processes to finish
 wait
