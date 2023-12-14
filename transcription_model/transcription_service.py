@@ -8,11 +8,12 @@ class TranscriptionService():
         self.conformer = nemo_asr.models.EncDecCTCModelBPE.restore_from(
             restore_path=config.MODEL_PATH,
         )
+        self.conformer.eval()
 
-    def inference(self, file_paths):
+    def inference(self, file_paths, batch_size):
         transcription = self.conformer.transcribe(
             paths2audio_files=file_paths,
-            batch_size=16,
+            batch_size=batch_size,
         )
 
         return transcription

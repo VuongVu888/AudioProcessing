@@ -29,7 +29,10 @@ def do_work(ch, delivery_tag, properties, body):
         output_folder=config.SAVE_AUDIO_DIR,
         chunk_duration_seconds=25,
     )
-    inference_result = transcription_srv.inference(file_paths=file_paths)
+    inference_result = transcription_srv.inference(
+        file_paths=file_paths,
+        batch_size=16,
+    )
     inference_result = " ".join(inference_result)
     redis_client.set(properties.headers["inference_id"], inference_result)
 

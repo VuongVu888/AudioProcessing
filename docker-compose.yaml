@@ -5,13 +5,14 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
-    volumes:
-      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq/
     environment:
       - RABBITMQ_DEFAULT_USER=root
       - RABBITMQ_DEFAULT_PASS=root
-#    network_mode: host
+    volumes:
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+#    volumes:
+#      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+#      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq/
     networks:
       - app
 
@@ -21,9 +22,8 @@ services:
       - 6379:6379
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
-    volumes:
-      - ~/.docker-conf/redis/data/:/bitnami/redis/data
-#    network_mode: host
+#    volumes:
+#      - ~/.docker-conf/redis/data/:/bitnami/redis/data
     networks:
       - app
 

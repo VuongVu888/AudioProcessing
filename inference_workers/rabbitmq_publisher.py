@@ -14,7 +14,9 @@ class RabbitMQPublisher:
         self._params = pika.connection.ConnectionParameters(
             host=host,
             port=port,
-            credentials=pika.credentials.PlainCredentials(username, password))
+            credentials=pika.credentials.PlainCredentials(username, password),
+            heartbeat=600,
+        )
         self._conn = None
         self._channel = None
 
@@ -52,6 +54,10 @@ class RabbitMQPublisher:
             self._publish(msg, headers)
         except pika.exceptions.ConnectionClosed:
             logger.debug('reconnecting to queue')
+            self.connect()
+            self._publish(msg)
+        except pika.exceptions.AMQPConnectionError as e:
+            logger.debug('EOF Connection', e)
             self.connect()
             self._publish(msg)
 

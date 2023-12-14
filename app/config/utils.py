@@ -1,3 +1,4 @@
+import hashlib
 import os
 import uuid
 from pathlib import Path
@@ -37,8 +38,8 @@ async def save_file(audio_file, inference_id=None):
     save_file_path = os.path.join(save_file_path, f"{inference_id}.wav")
 
     async with aiofiles.open(save_file_path, 'wb') as out_file:
-        content = await audio_file.read()
-        await out_file.write(content)
+        # content = await audio_file.read()
+        await out_file.write(audio_file)
         await out_file.close()
 
     return save_file_path
@@ -46,7 +47,6 @@ async def save_file(audio_file, inference_id=None):
 def split_audio_file(input_file, output_folder, chunk_duration_seconds=5):
     # Read the audio file
     data, samplerate = sf.read(input_file)
-    print("Data shape: ", len(data.shape))
     if len(data.shape) != 1:
         data = np.mean(data, axis=1)
 

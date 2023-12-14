@@ -1,7 +1,7 @@
 import asyncio
+import hashlib
 import os
 import re
-import uuid
 
 import redis
 from fastapi import UploadFile, HTTPException
@@ -9,19 +9,18 @@ import soundfile as sf
 
 from app.config.utils import save_file, config
 from inference_workers.rabbitmq_publisher import rabbitmq_publisher
-from transcription_model.transcription_service import TranscriptionService
-
-# transcription_srv = TranscriptionService()
 
 redis_client = redis.Redis(host=config.REDIS_URL, port=config.REDIS_PORT)
 
 class AudioSrv():
     async def process_audio(self, audio_file: UploadFile):
-        inference_id = str(uuid.uuid4())
-        save_file_path = await save_file(audio_file, inference_id)
+        # Generate a unique hash as inference id for the audio file
+        audio_file_byte_format = await audio_file.read()
+        inference_id = hashlib.sha256(audio_file_byte_format).hexdigest()
+
+        save_file_path = await save_file(audio_file_byte_format, inference_id)
         audio_duration = self.get_audio_duration(save_file_path)
         inference_result = self.publish_rabbitmq(save_file_path, inference_id)
-        # inference_result = transcription_srv.inference([save_file_path])
         os.remove(save_file_path)
 
         return {
@@ -30,6 +29,11 @@ class AudioSrv():
         }
 
     def publish_rabbitmq(self, file_path, inference_id):
+        check_inference_result = redis_client.exists(inference_id)
+        if check_inference_result:
+            inference_result = redis_client.get(inference_id)
+            return inference_result
+
         headers = {
             'inference_id': inference_id
         }
@@ -38,7 +42,6 @@ class AudioSrv():
             headers=headers,
         )
 
-        check_inference_result = redis_client.exists(inference_id)
         while not check_inference_result:
             try:
                 check_inference_result = redis_client.exists(inference_id)
