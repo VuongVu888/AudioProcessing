@@ -6,6 +6,9 @@ import argparse
 
 import httpx
 
+# Usage
+# python tests/test_response_time.py -ap <audio file path> -ho <url> -p <port>
+
 if __name__ == "__main__":
     _logger = logging.getLogger(__file__)
     handler = logging.StreamHandler(sys.stdout)

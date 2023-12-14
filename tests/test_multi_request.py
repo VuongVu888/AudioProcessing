@@ -8,6 +8,9 @@ import argparse
 
 import httpx
 
+# Usage:
+# python tests/test_multi_request.py -ap <audio file folder> -ho <url> -p <port>
+
 async def send_request(file):
     url = f"{args.host}:{args.port}/api/audio/upload"
     files = {"audio_file": file, "type": "audio/wav"}
