@@ -13,8 +13,8 @@ terminate_processes() {
 # Trap Ctrl+C (SIGINT) signal to call the termination function
 trap terminate_processes INT
 
-# Start a tmux session for FastAPI
-tmux new-session -d -s mysession "python -u app/main.py"
+# Start a session for FastAPI
+uvicorn app.main:app --host 0.0.0.0 --port 3000 --workers 4 &
 
 # Start RabbitMQ consumers
 for i in {1..4}; do
