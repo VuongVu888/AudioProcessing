@@ -24,3 +24,11 @@ pip install -r requirements.txt
 docker compose up rabbitmq redis -d
 ./run.sh
 ```
+
+## Performance
+```bash
+Audio 5’: Time elapsed 16.60710597038269s
+Audio 10’:  Time elapsed 18.642625093460083s
+Audio 15’: Time elapsed 25.640119075775146s
+Audio 20’: Time elapsed 32.503416776657104s
+```
