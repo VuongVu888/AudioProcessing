@@ -63,13 +63,16 @@ if __name__ == "__main__":
                 f.close()
 
     req = []
-    for i in range(1):
+    for i in range(500):
         file_idx = random.randint(0, len(file_lists) - 1)
         req.append(send_request(file_lists[file_idx]))
 
     loop = asyncio.get_event_loop()
-    group = asyncio.gather(*req)
     start = time.time()
-    loop.run_until_complete(group)
+    try:
+        group = asyncio.gather(*req)
+        loop.run_until_complete(group)
+    except:
+        pass
     end = time.time()
     _logger.info(f"Time elapsed: {end - start}s")

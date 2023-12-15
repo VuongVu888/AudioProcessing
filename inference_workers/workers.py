@@ -31,7 +31,7 @@ def do_work(ch, delivery_tag, properties, body):
     )
     inference_result = transcription_srv.inference(
         file_paths=file_paths,
-        batch_size=16,
+        batch_size=8,
     )
     inference_result = " ".join(inference_result)
     redis_client.set(properties.headers["inference_id"], inference_result)
