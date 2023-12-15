@@ -41,7 +41,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    _logger.info("File name: ", args.audio_path)
+    _logger.info(f"File name: {args.audio_path}")
     with open(args.audio_path, "rb") as file:
         url = f"{args.host}:{args.port}/api/audio/upload"
         files = {"audio_file": file, "type": "audio/wav"}
