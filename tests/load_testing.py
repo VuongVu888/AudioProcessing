@@ -1,14 +1,13 @@
 import glob
 import json
 from locust import HttpUser, task, between
-import aiohttp
-# https://drive.google.com/file/d/1Lp71BhlxrGwIsL87WS8qBIw6i0BZOMSl/view?usp=sharing
+
 class AsyncLocustUser(HttpUser):
     wait_time = between(1, 5)  # Time between requests
     success_count = 0
 
     def on_start(self):
-        file_list = glob.iglob("/Users/vuongvu/University/XLTN/LibriSpeech/test-clean/*/*/*.flac", recursive=True)
+        file_list = glob.iglob("/Users/vuongvu/Downloads/Archive/*.wav", recursive=True)
         self.req = []
         for file in file_list:
             with open(file, 'rb') as f:

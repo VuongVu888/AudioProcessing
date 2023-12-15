@@ -2,6 +2,8 @@
 
 ENV_VARS_SCRIPT="set_env_vars.sh"
 
+conda activate audio-processing
+
 # Function to gracefully terminate processes
 terminate_processes() {
     echo "Terminating processes..."
