@@ -17,11 +17,9 @@ redis_client = redis.Redis(host=config.REDIS_URL, port=config.REDIS_PORT)
 
 class AudioSrv():
     async def process_audio(self, audio_file: UploadFile):
-        # Generate a unique hash as inference id for the audio file
-        audio_file_byte_format = await audio_file.read()
-        inference_id = xxhash.xxh64(audio_file_byte_format).hexdigest()
+        inference_id = str(uuid.uuid4())
 
-        save_file_path = await save_file(audio_file_byte_format, inference_id)
+        save_file_path = await save_file(audio_file, inference_id)
         audio_duration = self.get_audio_duration(save_file_path)
         inference_result = self.publish_rabbitmq(save_file_path, inference_id)
         os.remove(save_file_path)
@@ -32,11 +30,6 @@ class AudioSrv():
         }
 
     def publish_rabbitmq(self, file_path, inference_id):
-        check_inference_result = redis_client.exists(inference_id)
-        if check_inference_result:
-            inference_result = redis_client.get(inference_id)
-            return inference_result
-
         headers = {
             'inference_id': inference_id
         }
@@ -45,6 +38,7 @@ class AudioSrv():
             headers=headers,
         )
 
+        check_inference_result = redis_client.exists(inference_id)
         while not check_inference_result:
             try:
                 check_inference_result = redis_client.exists(inference_id)

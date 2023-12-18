@@ -38,8 +38,8 @@ async def save_file(audio_file, inference_id=None):
     save_file_path = os.path.join(save_file_path, f"{inference_id}.wav")
 
     async with aiofiles.open(save_file_path, 'wb') as out_file:
-        # content = await audio_file.read()
-        await out_file.write(audio_file)
+        content = await audio_file.read()
+        await out_file.write(content)
         await out_file.close()
 
     return save_file_path
