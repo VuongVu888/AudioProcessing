@@ -2,11 +2,14 @@ import asyncio
 import hashlib
 import os
 import re
+import uuid
 
+import xxhash
 import redis
 from fastapi import UploadFile, HTTPException
 import soundfile as sf
 
+from app.config.const import BUF_SIZE
 from app.config.utils import save_file, config
 from inference_workers.rabbitmq_publisher import rabbitmq_publisher
 
@@ -16,7 +19,7 @@ class AudioSrv():
     async def process_audio(self, audio_file: UploadFile):
         # Generate a unique hash as inference id for the audio file
         audio_file_byte_format = await audio_file.read()
-        inference_id = hashlib.sha256(audio_file_byte_format).hexdigest()
+        inference_id = xxhash.xxh64(audio_file_byte_format).hexdigest()
 
         save_file_path = await save_file(audio_file_byte_format, inference_id)
         audio_duration = self.get_audio_duration(save_file_path)

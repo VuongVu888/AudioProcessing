@@ -1,5 +1,6 @@
 import functools
 import logging
+import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
@@ -35,6 +36,8 @@ def do_work(ch, delivery_tag, properties, body):
     )
     inference_result = " ".join(inference_result)
     redis_client.set(properties.headers["inference_id"], inference_result)
+    for files in file_paths:
+        os.remove(files)
 
     cb = functools.partial(ack_message, ch, delivery_tag)
     ch.connection.add_callback_threadsafe(cb)

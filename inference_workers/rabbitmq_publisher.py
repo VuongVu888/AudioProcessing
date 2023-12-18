@@ -15,7 +15,6 @@ class RabbitMQPublisher:
             host=host,
             port=port,
             credentials=pika.credentials.PlainCredentials(username, password),
-            heartbeat=600,
         )
         self._conn = None
         self._channel = None

@@ -14,7 +14,6 @@ class RabbitMQSubsriber:
             host=host,
             port=port,
             credentials=pika.credentials.PlainCredentials(username, password),
-            heartbeat=600,
         )
         self._conn = None
         self._channel = None
@@ -42,9 +41,6 @@ class RabbitMQSubsriber:
 
     def consume(self):
         try:
-            self._channel.start_consuming()
-        except pika.exceptions.AMQPConnectionError as e:
-            self.close()
             self._channel.start_consuming()
         except KeyboardInterrupt:
             self._channel.stop_consuming()
