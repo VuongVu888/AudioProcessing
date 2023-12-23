@@ -1,4 +1,5 @@
 import nemo.collections.asr as nemo_asr
+import torch
 
 from app.config.utils import config
 
@@ -10,6 +11,7 @@ class TranscriptionService():
         )
         self.conformer.eval()
 
+    @torch.no_grad()
     def inference(self, file_paths, batch_size):
         transcription = self.conformer.transcribe(
             paths2audio_files=file_paths,

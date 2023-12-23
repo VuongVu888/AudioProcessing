@@ -11,7 +11,10 @@ import httpx
 # Usage:
 # python tests/test_multi_request.py -ap <audio file folder> -ho <url> -p <port>
 
+SUCCESS_REQUEST = 0
+
 async def send_request(file):
+    global SUCCESS_REQUEST
     url = f"{args.host}:{args.port}/api/audio/upload"
     files = {"audio_file": file, "type": "audio/wav"}
     async with httpx.AsyncClient(timeout=120) as client:
@@ -19,7 +22,8 @@ async def send_request(file):
             url,
             files=files,
         )
-        _logger.info("Response: %d", r.status_code)
+        if r.status_code == 200:
+            SUCCESS_REQUEST += 1
 
 if __name__ == "__main__":
     _logger = logging.getLogger(__file__)
@@ -66,13 +70,14 @@ if __name__ == "__main__":
     for i in range(500):
         file_idx = random.randint(0, len(file_lists) - 1)
         req.append(send_request(file_lists[file_idx]))
+    _logger.info(f"Total Request: {len(req)}")
 
     loop = asyncio.get_event_loop()
+
     start = time.time()
-    try:
-        group = asyncio.gather(*req)
-        loop.run_until_complete(group)
-    except:
-        pass
+    group = asyncio.gather(*req)
+    loop.run_until_complete(group)
     end = time.time()
+
     _logger.info(f"Time elapsed: {end - start}s")
+    _logger.info(f"Total Success Request: {SUCCESS_REQUEST}")

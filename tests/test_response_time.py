@@ -51,3 +51,4 @@ if __name__ == "__main__":
             end = time.time()
             _logger.info(f"Time elapsed: {end - start}s")
             _logger.info("Response: %d\n%s", r.status_code, r.json())
+        file.close()
