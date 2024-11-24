@@ -17,11 +17,13 @@ redis_client = redis.Redis(host=config.REDIS_URL, port=config.REDIS_PORT)
 
 executor = ThreadPoolExecutor(max_workers=20)
 
+
 def ack_message(channel, delivery_tag):
     if channel.is_open:
         channel.basic_ack(delivery_tag)
     else:
         pass
+
 
 def do_work(ch, delivery_tag, properties, body):
     file_path = body.decode("utf-8")
@@ -42,13 +44,16 @@ def do_work(ch, delivery_tag, properties, body):
     cb = functools.partial(ack_message, ch, delivery_tag)
     ch.connection.add_callback_threadsafe(cb)
 
+
 def on_message(ch, method_frame, properties, body):
     delivery_tag = method_frame.delivery_tag
     executor.submit(do_work, ch, delivery_tag, properties, body)
 
+
 def main():
     rabbitmq_consumer.connect(message_callback=on_message)
     rabbitmq_consumer.consume()
+
 
 if __name__ == "__main__":
     handler = logging.StreamHandler(sys.stdout)

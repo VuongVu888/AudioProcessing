@@ -2,37 +2,35 @@ import asyncio
 import hashlib
 import os
 import re
-import uuid
 
-import xxhash
 import redis
-from fastapi import UploadFile, HTTPException
 import soundfile as sf
+from fastapi import HTTPException, UploadFile
 
-from app.config.const import BUF_SIZE
-from app.config.utils import save_file, config
+from app.config.utils import config, save_file
 from inference_workers.rabbitmq_publisher import rabbitmq_publisher
 
 redis_client = redis.Redis(host=config.REDIS_URL, port=config.REDIS_PORT)
 
-class AudioSrv():
-    async def process_audio(self, audio_file: UploadFile):
-        inference_id = str(uuid.uuid4())
 
-        save_file_path = await save_file(audio_file, inference_id)
+class AudioSrv:
+    async def process_audio(self, audio_file: UploadFile):
+        audio_file_byte_format = await audio_file.read()
+        inference_id = hashlib.sha256(audio_file_byte_format).hexdigest()
+
+        save_file_path = await save_file(audio_file_byte_format, inference_id)
         audio_duration = self.get_audio_duration(save_file_path)
         inference_result = self.publish_rabbitmq(save_file_path, inference_id)
         os.remove(save_file_path)
 
-        return {
-            "audio_duration": audio_duration,
-            "text": inference_result
-        }
+        return {"audio_duration": audio_duration, "text": inference_result}
 
     def publish_rabbitmq(self, file_path, inference_id):
-        headers = {
-            'inference_id': inference_id
-        }
+        check_inference_result = redis_client.exists(inference_id)
+        if check_inference_result:
+            return redis_client.get(inference_id)
+
+        headers = {"inference_id": inference_id}
         rabbitmq_publisher.publish(
             msg=file_path,
             headers=headers,
@@ -54,11 +52,9 @@ class AudioSrv():
         return duration_in_seconds
 
     async def disect_audio_file(self, save_file_path):
-        cmd = f'sox --i "{save_file_path}" | awk \'/Sample Rate/ {{printf \"Sample Rate: %s\\n\", $4}} /Duration/ {{printf \"Duration: %s\\n\", $5}}\''
+        cmd = f'sox --i "{save_file_path}" | awk \'/Sample Rate/ {{printf "Sample Rate: %s\\n", $4}} /Duration/ {{printf "Duration: %s\\n", $5}}\''
         proc = await asyncio.create_subprocess_shell(
-            cmd,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
         stdout, stderr = await proc.communicate()
         sample_rate, duration = 0, 0
@@ -72,7 +68,7 @@ class AudioSrv():
         if stderr:
             raise HTTPException(
                 status_code=500,
-                detail="There has been an error when dissecting .WAV file"
+                detail="There has been an error when dissecting .WAV file",
             )
 
         return sample_rate, duration
