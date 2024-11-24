@@ -4,7 +4,7 @@ import torch
 from app.config.utils import config
 
 
-class TranscriptionService():
+class TranscriptionService:
     def __init__(self):
         self.conformer = nemo_asr.models.EncDecCTCModelBPE.restore_from(
             restore_path=config.MODEL_PATH,

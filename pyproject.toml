@@ -28,16 +28,22 @@ exclude = [
   "venv",
   "__init__.py",
 ]
-extend-exclude = ["*.ipynb", "*.pyi"]
+extend-exclude = ["*.ipynb", "*.pyi", "*_pb2.py", "*_pb2_grpc.py"]
 
 line-length = 78
 indent-width = 4
 target-version = "py311"
 
-[tool.ruff.lint]
+
+select = ["E", "W", "F", "N", "UP", "B", "SIM", "I"]
+extend-include = ["RUF200"]
+ignore = ["B008"]
 fixable = ["ALL"]
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
-extend-select = ["E501", "UP", "D"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+"**/{tests,docs,tools}/*" = ["E402"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -47,3 +53,5 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = 20

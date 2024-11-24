@@ -1,8 +1,7 @@
-import os
+import argparse
+import logging
 import sys
 import time
-import logging
-import argparse
 
 import httpx
 

@@ -3,10 +3,15 @@ import logging
 import pika
 from pika.exchange_type import ExchangeType
 
-from app.config.const import RABBITMQ_EXCHANGE, RABBITMQ_QUEUE, RABBITMQ_ROUTING_KEY
+from app.config.const import (
+    RABBITMQ_EXCHANGE,
+    RABBITMQ_QUEUE,
+    RABBITMQ_ROUTING_KEY,
+)
 from app.config.utils import config
 
 logger = logging.getLogger(__file__)
+
 
 class RabbitMQSubsriber:
     def __init__(self, host, port, username, password):
@@ -22,11 +27,13 @@ class RabbitMQSubsriber:
         if not self._conn or self._conn.is_closed:
             self._conn = pika.BlockingConnection(self._params)
             self._channel = self._conn.channel()
-            self._channel.exchange_declare(exchange=RABBITMQ_EXCHANGE,
-                                           exchange_type=ExchangeType.fanout,
-                                           passive=False,
-                                           durable=True,
-                                           auto_delete=False)
+            self._channel.exchange_declare(
+                exchange=RABBITMQ_EXCHANGE,
+                exchange_type=ExchangeType.fanout,
+                passive=False,
+                durable=True,
+                auto_delete=False,
+            )
             self._channel.queue_declare(queue=RABBITMQ_QUEUE)
             self._channel.queue_bind(
                 queue=RABBITMQ_QUEUE,
@@ -48,9 +55,10 @@ class RabbitMQSubsriber:
 
     def close(self):
         if self._conn and self._conn.is_open:
-            logger.debug('closing queue connection')
+            logger.debug("closing queue connection")
             self._channel.close()
             self._conn.close()
+
 
 rabbitmq_consumer = RabbitMQSubsriber(
     host=config.RABBITMQ_URL,

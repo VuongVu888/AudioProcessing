@@ -1,10 +1,10 @@
+import argparse
 import asyncio
+import logging
 import os
 import random
 import sys
 import time
-import logging
-import argparse
 
 import httpx
 
@@ -12,6 +12,7 @@ import httpx
 # python tests/test_multi_request.py -ap <audio file folder> -ho <url> -p <port>
 
 SUCCESS_REQUEST = 0
+
 
 async def send_request(file):
     global SUCCESS_REQUEST
@@ -24,6 +25,7 @@ async def send_request(file):
         )
         if r.status_code == 200:
             SUCCESS_REQUEST += 1
+
 
 if __name__ == "__main__":
     _logger = logging.getLogger(__file__)
@@ -61,7 +63,7 @@ if __name__ == "__main__":
     for file in os.listdir(args.audio_path):
         f = os.path.join(args.audio_path, file)
         if os.path.isfile(f):
-            with open(f, 'rb') as f:
+            with open(f, "rb") as f:
                 data = f.read()
                 file_lists.append(data)
                 f.close()
