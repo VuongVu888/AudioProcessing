@@ -32,3 +32,9 @@ Audio 10’:  Time elapsed 18.642625093460083s
 Audio 15’: Time elapsed 25.640119075775146s
 Audio 20’: Time elapsed 32.503416776657104s
 ```
+
+## Lint and Format
+```bash
+ruff check --fix
+ruff format
+```
